@@ -23,47 +23,48 @@ while True:
     decoded = message.decode()
     python_object = json.loads(decoded)
     if (python_object['city'], python_object['state']) in data_set:
-        message = str({
+        message = {
             "valid": True,
             "city": python_object["city"],
             "state": python_object["state"],
             "formatted_location": f"{python_object['city']}, {python_object['state']}"
-        })
+        }
     else:
         # valid state
         if python_object['state'] in state_set:
             # valid city
             if python_object['city'] in city_set:
                 # city does not exist in that state
-                message = str({
+                message = {
                     "valid": False,
                     "error": f"{python_object['city']} does not exist in {python_object['state']}",
                     "suggestion": "Please validate your input"
-                    })
+                }
             # invalid city
             else:
-                message = str({
+                message = {
                     "valid": False,
                     "error": f"Invalid city name: {python_object['city']}",
                     "suggestion": "Please check spelling of the city and try again"
-                    })
+                }
         # invalid state
         else:
             # valid city
             if python_object['city'] in city_set:
                 # city does not exist in that state
-                message = str({
+                message = {
                     "valid": False,
                     "error": f"Invalid state name: {python_object['state']}",
                     "suggestion": "Please check the spelling of the state and try again"
-                    })
+                }
             # invalid city
             else:
-                message = str({
+                message = {
                     "valid": False,
                     "error": f"Invalid city and state name: {python_object['city']}, {python_object['state']}",
                     "suggestion": "Please validate your input"
-                    })
-        socket.send_string(message)
+                }
+
+    socket.send_string(json.dumps(message))
 
 context.destroy()
