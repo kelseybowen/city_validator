@@ -73,11 +73,6 @@ The response from the microservice will be a JSON object.
 ```python
 response = socket.recv_string()
 response_data = json.loads(response)
-
-if response_data["valid"]:
-    print(f"Location verified: {response_data['formatted_location']}")
-else:
-    print(f"Error: {response_data['message']}")
 ```
 
 ---
