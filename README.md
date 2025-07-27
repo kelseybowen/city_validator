@@ -84,20 +84,33 @@ The following UML sequence diagram shows how the main program interacts with the
 ```mermaid
 sequenceDiagram
     participant Client
+    participant ZeroMQ
     participant CityStateValidationMicroservice
 
-    Client->>CityStateValidationMicroservice: Send JSON Request (city, state)
+    Client->>ZeroMQ: Send JSON Request (city, state)
+    activate ZeroMQ
+    ZeroMQ->>CityStateValidationMicroservice: Forward Request
+    deactivate ZeroMQ
     activate CityStateValidationMicroservice
     Note right of CityStateValidationMicroservice: Validates city and state
-    CityStateValidationMicroservice-->>Client: Send JSON Response (valid: true, city, state, formatted_location)
+    CityStateValidationMicroservice->>ZeroMQ: Send JSON Response (valid: true, city, state, formatted_location)
     deactivate CityStateValidationMicroservice
+    activate ZeroMQ
+    ZeroMQ->>Client: Deliver Response
+    deactivate ZeroMQ
 
     alt Invalid Request
-        Client->>CityStateValidationMicroservice: Send JSON Request (invalid city/state)
+        Client->>ZeroMQ: Send JSON Request (invalid city/state)
+        activate ZeroMQ
+        ZeroMQ->>CityStateValidationMicroservice: Forward Request
+        deactivate ZeroMQ
         activate CityStateValidationMicroservice
         Note right of CityStateValidationMicroservice: Identifies invalid input
-        CityStateValidationMicroservice-->>Client: Send JSON Response (valid: false, error, message)
+        CityStateValidationMicroservice->>ZeroMQ: Send JSON Response (valid: false, error, message)
         deactivate CityStateValidationMicroservice
+        activate ZeroMQ
+        ZeroMQ->>Client: Deliver Response
+        deactivate ZeroMQ
     end
 ```
 
